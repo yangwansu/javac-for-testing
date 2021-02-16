@@ -16,6 +16,11 @@ public class Javac {
         sourceFiles = new HashMap<>();
     }
 
+    public Javac with(SourceFile sourceFile) {
+        sourceFiles.put(sourceFile.getFileName(), sourceFile.toString());
+        return this;
+    }
+
     public Javac withSourceFile(String fileName, String codes) {
         sourceFiles.put(fileName, codes);
         return this;

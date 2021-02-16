@@ -1,8 +1,8 @@
 package net.masil.testing.compile;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import static java.lang.reflect.Modifier.PUBLIC;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -16,30 +16,33 @@ class JavacTest {
     // 시작은 어노테이션 프로세스
 
 
-    /** TODO
-     *  [ ] 헬로우월드 컴파일
-     *  [ ] 패키지 명 넣기
-     *  [ ] 소스파일이 여러개 일때
-     *  [ ] 옵션 : - d
-     *  [ ] 옵션 : - processor
-     *  [ ] 옵션: -cp
+    /**
+     * TODO
+     * [X] 헬로우월드 컴파일
+     * [ ] 패키지 명 넣기
+     * [ ] 소스파일이 여러개 일때
+     * [ ] 옵션 : - d
+     * [ ] 옵션 : - processor
+     * [ ] 옵션: -cp
      */
 
     @Test
     void compile_hello_world() {
 
-        final String helloWorld = "public class HelloWorld {  }";
-        Compilation actual = Javac.init()
-                .withSourceFile("HelloWorld", helloWorld)
-                .compile();
+        SourceFile helloWorld = SourceFile.withName("HelloWorld")
+                .addModifier(PUBLIC)
+                .withEmptyBody();
 
-        assertTrue(actual.hasClass(ClassName.of("HelloWorld")));
+        assertTrue(Javac.init()
+                .with(helloWorld)
+                .compile().hasClass(helloWorld.getClassName()));
 
-        final String illegal_helloWorld = "public classxxxs IllegalHelloWorld {  }";
-        Compilation actual2 = Javac.init()
-                .withSourceFile("IllegalHelloWorld", illegal_helloWorld)
-                .compile();
+        SourceFile illegalHelloWorld = SourceFile.withName("IllegalHelloWorld")
+                .addModifier(PUBLIC)
+                .withBody("xxxxxxxxxxx");
 
-        assertFalse(actual2.hasClass(ClassName.of("IllegalHelloWorld")));
+        assertFalse(Javac.init()
+                .with(illegalHelloWorld)
+                .compile().hasClass(illegalHelloWorld.getClassName()));
     }
 }
