@@ -36,13 +36,13 @@ class Sources {
         return this;
     }
 
-    public void compile() {
+    public void compile(String optionName, String optionValue) {
         List<String> options = new ArrayList<>();
         processorOption(options);
 
-        options.add("-d");
+        options.add(optionName);
 
-        File file1 = new File("build/functionalTest");
+        File file1 = new File(optionValue);
         file1.mkdirs();
         options.add(file1.getAbsolutePath());
 
