@@ -38,14 +38,12 @@ public class SourceFile {
         final int i0 = name.lastIndexOf(".");
         final String packageName = i0 == -1 ? "" : name.substring(0, i0);
 
-        final String className = getClassName().toString();
-
         final StringBuilder sb = new StringBuilder();
         if (!"".equals(packageName)) {
-            sb.append("package ").append(name).append(";");
+            sb.append("package ").append(packageName).append(";");
         }
         sb.append("public "); //TODO modifier
-        sb.append("class ").append(className);
+        sb.append("class ").append(getSimpleClassName());
         sb.append("{");
         sb.append(body);
         sb.append("}");
@@ -56,11 +54,18 @@ public class SourceFile {
 
 
     public String getFileName() {
-        return getClassName().toString();
+        return getSimpleClassName()+".java";
     }
 
     public ClassName getClassName() {
-        final int i1 = name.lastIndexOf(".");
-        return ClassName.of(i1 == -1 ? name : name.substring(i1));
+        return ClassName.of(name);
+    }
+
+    public String getPackageName() {
+        return getClassName().getPackageName();
+    }
+
+    public String getSimpleClassName() {
+        return getClassName().getSimpleClassName();
     }
 }

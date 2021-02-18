@@ -21,9 +21,9 @@ class JavacTest {
     /**
      * TODO
      * [X] 헬로우월드 컴파일
-     * [ ] 패키지 명 넣기
+     * [X] 패키지 명 넣기
      * [ ] 소스파일이 여러개 일때
-     * [ ] 옵션 : - d build/classes --cp
+     * [X] 옵션 : - d build/classes --cp
      * [ ] 옵션 : - processor
      * [ ] 옵션: -cp
      */
@@ -31,22 +31,22 @@ class JavacTest {
     @Test
     void compile_hello_world() {
 
-        SourceFile helloWorld = SourceFile.withName("HelloWorld")
+        SourceFile helloWorld = SourceFile.withName("org.masil.testing.compile.HelloWorld")
                 .addModifier(PUBLIC)
                 .withEmptyBody();
 
         assertTrue(Javac.init()
                 .with(helloWorld)
-                .options(BUILD_DIRECTORY, "build/functionalTest")
+                .options(BUILD_DIRECTORY, "build/test1")
                 .compile().hasClass(helloWorld.getClassName()));
 
-        SourceFile illegalHelloWorld = SourceFile.withName("IllegalHelloWorld")
+        SourceFile illegalHelloWorld = SourceFile.withName("HelloWorld")
                 .addModifier(PUBLIC)
                 .withBody("xxxxxxxxxxx");
 
         assertFalse(Javac.init()
                 .with(illegalHelloWorld)
-                .options(BUILD_DIRECTORY, "build/functionalTest")
+                .options(BUILD_DIRECTORY, "build/test2")
                 .compile().hasClass(illegalHelloWorld.getClassName()));
     }
 }

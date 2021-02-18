@@ -7,7 +7,7 @@ public class Javac {
 
     public static final String BUILD_DIRECTORY = "-d";
 
-    private Map<String,String> sourceFiles;
+    private Map<String,SourceFile> sourceFiles;
     private String oName;
     private String oValue;
 
@@ -20,19 +20,16 @@ public class Javac {
     }
 
     public Javac with(SourceFile sourceFile) {
-        sourceFiles.put(sourceFile.getFileName(), sourceFile.toString());
+        sourceFiles.put(sourceFile.getSimpleClassName(), sourceFile);
         return this;
     }
 
-    public Javac withSourceFile(String fileName, String codes) {
-        sourceFiles.put(fileName, codes);
-        return this;
-    }
 
     public Compilation compile() {
         try {
             //TODO  사라져라 뿅 !
-            Sources.withClassName("HelloWorld").withLines(sourceFiles.get("HelloWorld")).compile(oName, oValue);
+            String simpleClassName = sourceFiles.get("HelloWorld").getSimpleClassName();
+            Sources.withClassName(simpleClassName).withLines(simpleClassName).compile(oName, oValue);
         } catch (RuntimeException e) {
             System.out.println(e);
         }

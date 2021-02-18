@@ -7,18 +7,19 @@ import java.net.URLClassLoader;
 
 public class Compilation {
 
-    private final String buildClasses;
+    private final String buildDir;
 
-    public Compilation(String buildClasses) {
-        this.buildClasses = buildClasses;
+    public Compilation(String buildDir) {
+        this.buildDir = buildDir;
     }
+
     public boolean hasClass(String className) {
         return hasClass(ClassName.of(className));
     }
 
     public boolean hasClass(ClassName className) {
         try {
-            URLClassLoader classLoader = URLClassLoader.newInstance(new URL[] { new File(buildClasses).toURI().toURL() });
+            URLClassLoader classLoader = URLClassLoader.newInstance(new URL[] { new File(buildDir).toURI().toURL() });
              Class.forName(className.toString(), true, classLoader);
         } catch (ClassNotFoundException e) {
             System.err.println("Class not found: " + e);
