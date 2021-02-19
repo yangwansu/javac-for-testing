@@ -25,4 +25,8 @@ public class ClassName {
     public static ClassName of(String className) {
         return new ClassName(className);
     }
+
+    public String getFileName() {
+        return getSimpleClassName() + ".java";
+    }
 }

@@ -1,12 +1,8 @@
 package net.masil.testing.compile;
 
-import java.util.HashSet;
-import java.util.Set;
-
 public class SourceFile {
 
-    private final String name;
-    private final Set<Integer> modifier;
+    private final ClassName name;
     private String body;
 
     public static SourceFile withName(String name) {
@@ -14,17 +10,7 @@ public class SourceFile {
     }
 
     private SourceFile(String name) {
-        this.name = name;
-        modifier = new HashSet<>();
-    }
-
-    public SourceFile addModifier(int modifier) {
-        this.modifier.add(modifier);
-        return this;
-    }
-
-    public SourceFile withEmptyBody() {
-        return withBody("");
+        this.name = ClassName.of(name);
     }
 
     public SourceFile withBody(String body) {
@@ -35,34 +21,20 @@ public class SourceFile {
     @Override
     public String toString() {
 
-        final int i0 = name.lastIndexOf(".");
-        final String packageName = i0 == -1 ? "" : name.substring(0, i0);
+        final String packageName = this.name.getPackageName();
 
         final StringBuilder sb = new StringBuilder();
         if (!"".equals(packageName)) {
-            sb.append("package ").append(packageName).append(";");
+            sb.append("package ").append(packageName).append(";").append("\n");
         }
-        sb.append("public "); //TODO modifier
-        sb.append("class ").append(getSimpleClassName());
-        sb.append("{");
         sb.append(body);
-        sb.append("}");
 
         return sb.toString();
 
     }
 
-
-    public String getFileName() {
-        return getSimpleClassName()+".java";
-    }
-
     public ClassName getClassName() {
-        return ClassName.of(name);
-    }
-
-    public String getPackageName() {
-        return getClassName().getPackageName();
+        return this.name;
     }
 
     public String getSimpleClassName() {
