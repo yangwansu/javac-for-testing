@@ -27,9 +27,9 @@ public class Javac {
 
     public Compilation compile() {
         try {
-            //TODO  사라져라 뿅 !
-            String simpleClassName = sourceFiles.get("HelloWorld").getSimpleClassName();
-            Sources.withClassName(simpleClassName).withLines(simpleClassName).compile(oName, oValue);
+            Sources sources = new Sources();
+            sourceFiles.forEach((key, value) -> sources.withSourceFile(value));
+            sources.compile(oName,oValue);
         } catch (RuntimeException e) {
             System.out.println(e);
         }

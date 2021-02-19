@@ -7,27 +7,24 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.URI;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
+
+import static java.util.stream.Collectors.toList;
 
 class Sources {
 
     public static final boolean COMPILE_FAILED = false;
     private final List<Class<? extends Processor>> processors;
-    private String[] lines;
-    private String className;
+    private List<SourceFile> files;
 
-    public static Sources withClassName(String className) {
-        return new Sources(className);
-    }
-
-    public Sources(String className) {
-        this.className = className;
+    public Sources() {
         this.processors = new ArrayList<>();
+        this.files = new ArrayList<>();
     }
 
-    public Sources withLines(String... lines) {
-        this.lines = lines;
+
+    public Sources withSourceFile(SourceFile sourceFile) {
+        this.files.add(sourceFile);
         return this;
     }
 
@@ -48,8 +45,9 @@ class Sources {
 
         JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
         DiagnosticCollector<JavaFileObject> diagnostics = new DiagnosticCollector<>();
-        JavaFileObject file = javaFileObject(lines);
-        Iterable<? extends JavaFileObject> compilationUnits = Collections.singletonList(file);
+
+        List<JavaFileObject> compilationUnits = files.stream().map(this::javaFileObject).collect(toList());
+
 
         JavaCompiler.CompilationTask task = compiler.getTask(null, null, diagnostics, options, null, compilationUnits);
 
@@ -74,14 +72,12 @@ class Sources {
         options.add(list);
     }
 
-    private JavaFileObject javaFileObject(String... lines) {
+    private JavaFileObject javaFileObject(SourceFile sourceFile) {
         StringWriter writer = new StringWriter();
         PrintWriter out = new PrintWriter(writer);
-        for (String line : lines) {
-            out.println(line);
-        }
+        out.println(sourceFile.toString());
         out.close();
-        return new JavaSourceFromString(this.className, writer.toString());
+        return new JavaSourceFromString(sourceFile.getClassName().toString(), writer.toString());
     }
 
     static class JavaSourceFromString extends SimpleJavaFileObject {

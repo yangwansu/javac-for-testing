@@ -22,10 +22,11 @@ class JavacTest {
      * TODO
      * [X] 헬로우월드 컴파일
      * [X] 패키지 명 넣기
-     * [ ] 소스파일이 여러개 일때
+     * [X] 소스파일이 여러개 일때
      * [X] 옵션 : - d build/classes --cp
      * [ ] 옵션 : - processor
      * [ ] 옵션: -cp
+     * [ ] source file 이 너무 과해 파일이름과 내용만 있으면 될것같음
      */
 
     @Test
@@ -35,10 +36,19 @@ class JavacTest {
                 .addModifier(PUBLIC)
                 .withEmptyBody();
 
-        assertTrue(Javac.init()
+        SourceFile foo = SourceFile.withName("org.masil.testing.compile.Foo")
+                .addModifier(PUBLIC)
+                .withEmptyBody();
+
+        Compilation compilation = Javac.init()
                 .with(helloWorld)
+                .with(foo)
                 .options(BUILD_DIRECTORY, "build/test1")
-                .compile().hasClass(helloWorld.getClassName()));
+                .compile();
+
+        assertTrue(compilation.hasClass(helloWorld.getClassName()));
+        assertTrue(compilation.hasClass(foo.getClassName()));
+        assertFalse(compilation.hasClass(ClassName.of("org.masil.testing.compile.Bar")));
 
         SourceFile illegalHelloWorld = SourceFile.withName("HelloWorld")
                 .addModifier(PUBLIC)
