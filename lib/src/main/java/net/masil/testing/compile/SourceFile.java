@@ -1,6 +1,9 @@
 package net.masil.testing.compile;
 
-public class SourceFile {
+import javax.tools.SimpleJavaFileObject;
+import java.net.URI;
+
+public class SourceFile extends SimpleJavaFileObject {
 
     private final ClassName name;
     private String body;
@@ -10,12 +13,18 @@ public class SourceFile {
     }
 
     private SourceFile(String name) {
+        super(URI.create("string:///" + name.replace('.', '/') + Kind.SOURCE.extension), Kind.SOURCE);
         this.name = ClassName.of(name);
     }
 
     public SourceFile withBody(String body) {
         this.body = body;
         return this;
+    }
+
+    @Override
+    public CharSequence getCharContent(boolean ignoreEncodingErrors) {
+        return toString();
     }
 
     @Override
