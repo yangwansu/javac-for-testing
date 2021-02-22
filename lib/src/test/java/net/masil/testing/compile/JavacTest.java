@@ -2,7 +2,6 @@ package net.masil.testing.compile;
 
 import org.junit.jupiter.api.Test;
 
-import static java.lang.reflect.Modifier.PUBLIC;
 import static net.masil.testing.compile.Javac.BUILD_DIRECTORY;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -28,7 +27,8 @@ class JavacTest {
      * [ ] 옵션: -cp
      * [X] source file 이 너무 과해 파일이름과 내용만 있으면 될것같음
      * [ ] 메서드 실행
-     * [ ] 옵션: -d 에 대한 죄악 제거하기
+     * [X] 옵션: -d 에 대한 죄악 제거하기
+     * [ ] -d 옵션을 사용하지 않으면 기본 빌드 디렉토리가 설정된다.
      */
 
     @Test

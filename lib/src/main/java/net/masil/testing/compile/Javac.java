@@ -1,22 +1,25 @@
 package net.masil.testing.compile;
 
+
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class Javac {
 
     public static final String BUILD_DIRECTORY = "-d";
 
-    private Map<String,SourceFile> sourceFiles;
-    private String oName;
-    private String oValue;
+    private final Map<String, SourceFile> sourceFiles;
+    private final List<Option> options;
 
     public static Javac init() {
         return new Javac();
     }
 
     private Javac() {
-        sourceFiles = new HashMap<>();
+        this.sourceFiles = new HashMap<>();
+        this.options = new ArrayList<>();
     }
 
     public Javac with(SourceFile sourceFile) {
@@ -29,17 +32,18 @@ public class Javac {
         try {
             Sources sources = new Sources();
             sourceFiles.forEach((key, value) -> sources.withSourceFile(value));
-            sources.compile(oName,oValue);
+            sources.compile(options);
+
         } catch (RuntimeException e) {
             System.out.println(e);
         }
 
-        return new Compilation(oValue);
+        return new Compilation(options);
     }
 
     public Javac options(String name, String value) {
-        this.oName = name;
-        this.oValue = value;
+        Option option = new Option(name, value);
+         this.options.add(option);
         return this;
     }
 }

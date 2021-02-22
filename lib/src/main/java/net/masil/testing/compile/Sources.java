@@ -31,31 +31,21 @@ class Sources {
         return this;
     }
 
-    public void compile(String optionName, String optionValue) {
-        List<String> options = new ArrayList<>();
-        processorOption(options);
 
-        options.add(optionName);
+    public void compile(List<Option> options) {
+        List<String> optionsStr = new ArrayList<>();
+        processorOption(optionsStr);
 
-        File file1 = new File(optionValue);
-        file1.mkdirs();
-        options.add(file1.getAbsolutePath());
+        options.forEach(o-> {
+            if(Javac.BUILD_DIRECTORY.equals(o.getName())) {
+                File file1 = new File(o.getValue());
+                file1.mkdirs();
+                optionsStr.add(o.getName());
+                optionsStr.add(file1.getAbsolutePath());
+            }
+        });
 
-        JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
-        DiagnosticCollector<JavaFileObject> diagnostics = new DiagnosticCollector<>();
-
-
-
-        JavaCompiler.CompilationTask task = compiler.getTask(null, null, diagnostics, options, null, files);
-
-        if (COMPILE_FAILED == task.call()) {
-
-            diagnostics.getDiagnostics().forEach(System.err::println);
-
-            throw new RuntimeException();
-        }
-
-
+        compile(optionsStr, files);
     }
 
     private void processorOption(List<String> options) {
@@ -69,5 +59,18 @@ class Sources {
         options.add(list);
     }
 
+    private void compile(List<String> options, List<SourceFile> files) {
+        JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
+        DiagnosticCollector<JavaFileObject> diagnostics = new DiagnosticCollector<>();
 
+
+        JavaCompiler.CompilationTask task = compiler.getTask(null, null, diagnostics, options, null, files);
+
+        if (COMPILE_FAILED == task.call()) {
+
+            diagnostics.getDiagnostics().forEach(System.err::println);
+
+            throw new RuntimeException();
+        }
+    }
 }
