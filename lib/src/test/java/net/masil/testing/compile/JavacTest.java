@@ -37,41 +37,41 @@ class JavacTest {
      * [ ] -d 옵션을 사용하지 않으면 기본 빌드 디렉토리가 설정된다.
      */
 
+    SourceFile helloWorld = SourceFile
+            .withName("org.masil.testing.compile.HelloWorld")
+            .withBody("public class HelloWorld { }");
+
+    SourceFile foo = SourceFile
+            .withName("org.masil.testing.compile.Foo")
+            .withBody("public class Foo { }");
+
+    SourceFile illegalHelloWorld = SourceFile.withName("org.masil.testing.compile.HelloWorld")
+            .withBody("package abc.edf;" +
+                    "class HelloWorld{" +
+                    "" +
+                    "}");
+
     @Test
     void compile_fail() {
-        SourceFile illegalHelloWorld = SourceFile.withName("org.masil.testing.compile.HelloWorld")
-                .withBody("package abc.edf;" +
-                        "class HelloWorld{" +
-                        "" +
-                        "}");
-        assertFalse(Javac.init()
+        Compilation compilation = Javac.init()
                 .with(illegalHelloWorld)
                 .options(BUILD_DIRECTORY, tempDir.getAbsolutePath())
-                .compile().hasClass(illegalHelloWorld.getClassName()));
+                .compile();
+
+        assertFalse(compilation.hasClass(illegalHelloWorld.getClassName()));
     }
 
 
     @Test
     void compile_hello_world() {
-
-        SourceFile helloWorld = SourceFile
-                .withName("org.masil.testing.compile.HelloWorld")
-                .withBody("public class HelloWorld { }");
-
-        SourceFile foo = SourceFile
-                .withName("org.masil.testing.compile.Foo")
-                .withBody("public class Foo { }");
-
         Compilation compilation = Javac.init()
-                .with(helloWorld)
-                .with(foo)
+                .with(helloWorld).with(foo)
                 .options(BUILD_DIRECTORY, tempDir.getAbsolutePath())
                 .compile();
 
         assertTrue(compilation.hasClass(helloWorld.getClassName()));
         assertTrue(compilation.hasClass(foo.getClassName()));
         assertFalse(compilation.hasClass(ClassName.of("org.masil.testing.compile.Bar")));
-
     }
 
 
