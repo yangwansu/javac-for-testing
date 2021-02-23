@@ -1,6 +1,9 @@
 package net.masil.testing.compile;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
+
+import java.io.File;
 
 import static net.masil.testing.compile.Javac.BUILD_DIRECTORY;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -15,6 +18,9 @@ class JavacTest {
     // 이 테스트를 위한 라이브러리에 관심을 가는 이유
     // 무엇을 테스트 하려고 하는 것인가.
     // 시작은 어노테이션 프로세스
+
+    @TempDir
+    File tempDir;
 
 
     /**
@@ -32,6 +38,20 @@ class JavacTest {
      */
 
     @Test
+    void compile_fail() {
+        SourceFile illegalHelloWorld = SourceFile.withName("org.masil.testing.compile.HelloWorld")
+                .withBody("package abc.edf;" +
+                        "class HelloWorld{" +
+                        "" +
+                        "}");
+        assertFalse(Javac.init()
+                .with(illegalHelloWorld)
+                .options(BUILD_DIRECTORY, tempDir.getAbsolutePath())
+                .compile().hasClass(illegalHelloWorld.getClassName()));
+    }
+
+
+    @Test
     void compile_hello_world() {
 
         SourceFile helloWorld = SourceFile
@@ -45,19 +65,14 @@ class JavacTest {
         Compilation compilation = Javac.init()
                 .with(helloWorld)
                 .with(foo)
-                .options(BUILD_DIRECTORY, "build/test1")
+                .options(BUILD_DIRECTORY, tempDir.getAbsolutePath())
                 .compile();
 
         assertTrue(compilation.hasClass(helloWorld.getClassName()));
         assertTrue(compilation.hasClass(foo.getClassName()));
         assertFalse(compilation.hasClass(ClassName.of("org.masil.testing.compile.Bar")));
 
-        SourceFile illegalHelloWorld = SourceFile.withName("HelloWorld")
-                .withBody("xxxxxxxxxxx");
-
-        assertFalse(Javac.init()
-                .with(illegalHelloWorld)
-                .options(BUILD_DIRECTORY, "build/test2")
-                .compile().hasClass(illegalHelloWorld.getClassName()));
     }
+
+
 }
