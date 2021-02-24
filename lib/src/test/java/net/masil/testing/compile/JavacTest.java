@@ -5,7 +5,7 @@ import org.junit.jupiter.api.io.TempDir;
 
 import java.io.File;
 
-import static net.masil.testing.compile.Javac.BUILD_DIRECTORY;
+import static net.masil.testing.compile.Options.BUILD_DIRECTORY;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -34,7 +34,7 @@ class JavacTest {
      * [X] source file 이 너무 과해 파일이름과 내용만 있으면 될것같음
      * [ ] 메서드 실행
      * [X] 옵션: -d 에 대한 죄악 제거하기
-     * [ ] -d 옵션을 사용하지 않으면 기본 빌드 디렉토리가 설정된다.
+     * [X] -d 옵션을 사용하지 않으면 기본 빌드 디렉토리가 설정된다.
      */
 
     SourceFile helloWorld = SourceFile
@@ -61,12 +61,22 @@ class JavacTest {
         assertFalse(compilation.hasClass(illegalHelloWorld.getClassName()));
     }
 
-
     @Test
     void compile_hello_world() {
         Compilation compilation = Javac.init()
-                .with(helloWorld).with(foo)
+                .with(helloWorld, foo)
                 .options(BUILD_DIRECTORY, tempDir.getAbsolutePath())
+                .compile();
+
+        assertTrue(compilation.hasClass(helloWorld.getClassName()));
+        assertTrue(compilation.hasClass(foo.getClassName()));
+        assertFalse(compilation.hasClass(ClassName.of("org.masil.testing.compile.Bar")));
+    }
+
+    @Test
+    void compile_hello_world_without_build_dir() {
+        Compilation compilation = Javac.init()
+                .with(helloWorld, foo)
                 .compile();
 
         assertTrue(compilation.hasClass(helloWorld.getClassName()));

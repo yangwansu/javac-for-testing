@@ -1,17 +1,19 @@
 package net.masil.testing.compile;
 
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import javax.tools.DiagnosticCollector;
+import javax.tools.JavaCompiler;
+import javax.tools.JavaFileObject;
+import javax.tools.ToolProvider;
+import java.util.*;
 
 public class Javac {
 
-    public static final String BUILD_DIRECTORY = "-d";
+    public static final boolean COMPILE_FAILED = false;
+
 
     private final Map<String, SourceFile> sourceFiles;
-    private final List<Option> options;
+    private Options ops;
 
     public static Javac init() {
         return new Javac();
@@ -19,31 +21,47 @@ public class Javac {
 
     private Javac() {
         this.sourceFiles = new HashMap<>();
-        this.options = new ArrayList<>();
+        this.ops = new Options();
     }
 
-    public Javac with(SourceFile sourceFile) {
-        sourceFiles.put(sourceFile.getSimpleClassName(), sourceFile);
+    public Javac with(SourceFile ... sourceFiles) {
+        Arrays.stream(sourceFiles).forEach(s->
+                this.sourceFiles.put(s.getSimpleClassName(), s)
+        );
+
+        return this;
+    }
+
+    public Javac options(String name, String value) {
+        this.ops = this.ops.set(name, value);
         return this;
     }
 
 
     public Compilation compile() {
+
         try {
-            Sources sources = new Sources();
-            sourceFiles.forEach((key, value) -> sources.withSourceFile(value));
-            sources.compile(options);
+            compile(this.ops, new ArrayList<>(sourceFiles.values()));
 
         } catch (RuntimeException e) {
             System.out.println(e);
         }
 
-        return new Compilation(options);
+        return new Compilation(this.ops);
     }
 
-    public Javac options(String name, String value) {
-        Option option = new Option(name, value);
-         this.options.add(option);
-        return this;
+    void compile(Options options, List<SourceFile> files) {
+        JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
+        DiagnosticCollector<JavaFileObject> diagnostics = new DiagnosticCollector<>();
+
+
+        JavaCompiler.CompilationTask task = compiler.getTask(null, null, diagnostics, options.buildOptionStr(), null, files);
+
+        if (COMPILE_FAILED == task.call()) {
+
+            diagnostics.getDiagnostics().forEach(System.err::println);
+
+            throw new RuntimeException();
+        }
     }
 }
