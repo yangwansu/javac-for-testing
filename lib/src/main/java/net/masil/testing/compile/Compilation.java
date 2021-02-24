@@ -19,7 +19,7 @@ public class Compilation {
 
     public boolean hasClass(ClassName className) {
         try {
-            URLClassLoader classLoader = URLClassLoader.newInstance(new URL[] { new File(options.getBuildDir()).toURI().toURL() });
+            URLClassLoader classLoader = URLClassLoader.newInstance(new URL[] { new File(options.buildDir()).toURI().toURL() });
              Class.forName(className.toString(), true, classLoader);
         } catch (ClassNotFoundException e) {
             System.err.println("Class not found: " + e);

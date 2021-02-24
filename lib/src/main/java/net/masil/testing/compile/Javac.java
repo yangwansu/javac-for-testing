@@ -21,7 +21,7 @@ public class Javac {
 
     private Javac() {
         this.sourceFiles = new HashMap<>();
-        this.ops = new Options();
+        this.ops = Options.init();
     }
 
     public Javac with(SourceFile ... sourceFiles) {
@@ -59,7 +59,7 @@ public class Javac {
 
         if (COMPILE_FAILED == task.call()) {
 
-            diagnostics.getDiagnostics().forEach(System.err::println);
+            diagnostics.getDiagnostics().forEach(System.out::println);
 
             throw new RuntimeException();
         }

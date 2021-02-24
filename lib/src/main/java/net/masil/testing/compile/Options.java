@@ -13,13 +13,17 @@ public class Options {
 
     private final List<Option> options;
 
-    Options() {
+    private Options() {
         this(new ArrayList<>());
     }
 
 
-    private Options(List<Option> options) {
+    Options(List<Option> options) {
         this.options = Collections.unmodifiableList(options);
+    }
+
+    public static Options init() {
+        return new Options();
     }
 
 
@@ -28,7 +32,7 @@ public class Options {
         return buildOptionStr().stream().reduce(new StringBuilder(), (sb, str) -> sb.append(str).append(" "), (sb1, sb2) -> null).toString().trim();
     }
 
-    String getBuildDir() {
+    String buildDir() {
         return options.stream().filter(o -> Objects.equals(o.getName(), BUILD_DIRECTORY)).map(Option::getValue).findFirst().orElse(DEFAULT_BUILD_DIR);
     }
 
@@ -44,7 +48,9 @@ public class Options {
     private void buildDir(List<String> optionsStr) {
         if (options.stream().noneMatch(o -> BUILD_DIRECTORY.equals(o.getName()))) {
             optionsStr.add(BUILD_DIRECTORY);
-            optionsStr.add(DEFAULT_BUILD_DIR);
+            File file1 = new File(DEFAULT_BUILD_DIR);
+            file1.mkdirs();
+            optionsStr.add(file1.getAbsolutePath());
 
         }
 
@@ -62,6 +68,18 @@ public class Options {
         ArrayList<Option> list = new ArrayList<>();
         list.add(new Option(optionName, optionValue));
         return new Options(list);
+    }
+
+    public String source() {
+        return options.stream().filter(o -> Objects.equals(o.getName(), "-source")).map(Option::getValue).findFirst().orElse(DEFAULT_BUILD_DIR);
+    }
+
+    public String target() {
+        return options.stream().filter(o -> Objects.equals(o.getName(), "-target")).map(Option::getValue).findFirst().orElse(DEFAULT_BUILD_DIR);
+    }
+
+    public boolean deprecation() {
+        return options.stream().anyMatch(o -> Objects.equals(o.getName(), "-deprecation"));
     }
 
     /**
