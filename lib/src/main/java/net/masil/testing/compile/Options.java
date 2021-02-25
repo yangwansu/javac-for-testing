@@ -49,19 +49,13 @@ public class Options {
         if (options.stream().noneMatch(o -> BUILD_DIRECTORY.equals(o.getName()))) {
             optionsStr.add(BUILD_DIRECTORY);
             File file1 = new File(DEFAULT_BUILD_DIR);
-            file1.mkdirs();
             optionsStr.add(file1.getAbsolutePath());
-
+        } else {
+            File file1 = new File(buildDir());
+            optionsStr.add(BUILD_DIRECTORY);
+            optionsStr.add(file1.getAbsolutePath());
         }
 
-        options.forEach(o -> {
-            if (BUILD_DIRECTORY.equals(o.getName())) {
-                File file1 = new File(o.getValue());
-                file1.mkdirs();
-                optionsStr.add(o.getName());
-                optionsStr.add(file1.getAbsolutePath());
-            }
-        });
     }
 
     public Options set(String optionName, String optionValue) {

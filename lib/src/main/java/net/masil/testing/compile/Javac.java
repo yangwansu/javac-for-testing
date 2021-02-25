@@ -5,6 +5,7 @@ import javax.tools.DiagnosticCollector;
 import javax.tools.JavaCompiler;
 import javax.tools.JavaFileObject;
 import javax.tools.ToolProvider;
+import java.io.File;
 import java.util.*;
 
 public class Javac {
@@ -40,12 +41,7 @@ public class Javac {
 
     public Compilation compile() {
 
-        try {
-            compile(this.ops, new ArrayList<>(sourceFiles.values()));
-
-        } catch (RuntimeException e) {
-            System.out.println(e);
-        }
+        compile(this.ops, new ArrayList<>(sourceFiles.values()));
 
         return new Compilation(this.ops);
     }
@@ -55,13 +51,15 @@ public class Javac {
         DiagnosticCollector<JavaFileObject> diagnostics = new DiagnosticCollector<>();
 
 
+        File file = new File(options.buildDir());
+        if(!file.exists()) {
+            file.mkdirs();
+        }
+
         JavaCompiler.CompilationTask task = compiler.getTask(null, null, diagnostics, options.buildOptionStr(), null, files);
 
         if (COMPILE_FAILED == task.call()) {
-
             diagnostics.getDiagnostics().forEach(System.out::println);
-
-            throw new RuntimeException();
         }
     }
 }
