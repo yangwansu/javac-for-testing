@@ -14,7 +14,7 @@ public class Javac {
 
 
     private final Map<String, SourceFile> sourceFiles;
-    private Options ops;
+    private OptionList optionList;
 
     public static Javac init() {
         return new Javac();
@@ -22,7 +22,7 @@ public class Javac {
 
     private Javac() {
         this.sourceFiles = new HashMap<>();
-        this.ops = Options.init();
+        this.optionList = OptionListBuilder.builder().build();
     }
 
     public Javac with(SourceFile ... sourceFiles) {
@@ -33,33 +33,29 @@ public class Javac {
         return this;
     }
 
-    public Javac options(String name, String value) {
-        this.ops = this.ops.set(name, value);
-        return this;
-    }
-
-
     public Compilation compile() {
 
-        compile(this.ops, new ArrayList<>(sourceFiles.values()));
-
-        return new Compilation(this.ops);
-    }
-
-    void compile(Options options, List<SourceFile> files) {
         JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
         DiagnosticCollector<JavaFileObject> diagnostics = new DiagnosticCollector<>();
 
-
-        File file = new File(options.buildDir());
+        File file = new File(optionList.buildDir());
         if(!file.exists()) {
             file.mkdirs();
         }
 
-        JavaCompiler.CompilationTask task = compiler.getTask(null, null, diagnostics, options.buildOptionStr(), null, files);
+        List<String> options1 = optionList.toList();
+
+        JavaCompiler.CompilationTask task = compiler.getTask(null, null, diagnostics, options1, null, new ArrayList<SourceFile>(sourceFiles.values()));
 
         if (COMPILE_FAILED == task.call()) {
             diagnostics.getDiagnostics().forEach(System.out::println);
         }
+
+        return new Compilation(optionList);
+    }
+
+    public Javac options(OptionListBuilder optionBuilder) {
+        this.optionList = optionBuilder.build();
+        return this;
     }
 }

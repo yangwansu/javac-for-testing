@@ -1,11 +1,20 @@
 package net.masil.testing.compile;
 
+import net.masil.testing.compile.options.BuildDir;
+import net.masil.testing.compile.options.Deprecation;
+import net.masil.testing.compile.options.SourceCompatibility;
+import net.masil.testing.compile.options.TargetCompatibility;
 import org.junit.jupiter.api.Test;
 
-import static net.masil.testing.compile.Options.DEFAULT_BUILD_DIR;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
-class OptionBuilderTest {
+import static net.masil.testing.compile.options.BuildDir.DEFAULT_BUILD_DIR;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertLinesMatch;
+
+class OptionListBuilderTest {
 
     /***
      *
@@ -45,13 +54,12 @@ class OptionBuilderTest {
 
     @Test
     void buildDir() {
-        Options op1 = Options.init();
 
-        String buildDir = "foo/build/test/classes";
-        Options op2 = op1.set(Options.BUILD_DIRECTORY, buildDir);
+        OptionList op = OptionListBuilder.builder().build();
 
-        assertEquals(DEFAULT_BUILD_DIR, op1.buildDir());
-        assertEquals(buildDir, op2.buildDir());
+        assertEquals(DEFAULT_BUILD_DIR, op.buildDir());
+
+
     }
     /**
      * TODO [ ] 중복되면 맨 뒤가 우선순위가 높다
@@ -65,17 +73,29 @@ class OptionBuilderTest {
     @Test
     void builder() {
         String buildDir = "foo/build/test/classes";
-        Options op = OptionBuilder.builder()
+        OptionList ops = OptionListBuilder.builder()
                 .buildDir(buildDir)
                 .source("1.8")
                 .target("1.8")
                 .deprecation()
                 .build();
 
-        assertEquals(buildDir, op.buildDir());
-        assertEquals("1.8", op.source());
-        assertEquals("1.8", op.target());
-        assertEquals(true, op.deprecation());
+        assertEquals(4, ops.size());
+
+        assertLinesMatch(toList(
+                BuildDir.OPTION_NAME, buildDir,
+                SourceCompatibility.OPTION_NAME, "1.8",
+                TargetCompatibility.OPTION_NAME, "1.8",
+                Deprecation.OPTION_NAME
+        ), ops.toList());
+
+        assertEquals(buildDir, ops.buildDir());
 
     }
+
+
+    private List<String> toList(String... str) {
+        return Collections.unmodifiableList(Arrays.asList(str));
+    }
+
 }

@@ -5,7 +5,6 @@ import org.junit.jupiter.api.io.TempDir;
 
 import java.io.File;
 
-import static net.masil.testing.compile.Options.BUILD_DIRECTORY;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -45,9 +44,9 @@ class JavacTest {
             .withName("org.masil.testing.compile.Foo")
             .withBody("public class Foo { }");
 
-    SourceFile illegalHelloWorld = SourceFile.withName("org.masil.testing.compile.HelloWorld")
+    SourceFile illegalHelloWorld = SourceFile.withName("org.masil.testing.compile.HelloWorld2")
             .withBody("package abc.edf;" +
-                    "class HelloWorld{" +
+                    "class HelloWorld2{" +
                     "" +
                     "}");
 
@@ -55,7 +54,7 @@ class JavacTest {
     void compile_fail() {
         Compilation compilation = Javac.init()
                 .with(illegalHelloWorld)
-                .options(BUILD_DIRECTORY, tempDir.getAbsolutePath())
+                .options(OptionListBuilder.builder().buildDir(tempDir.getAbsolutePath()))
                 .compile();
 
         assertFalse(compilation.hasClass(illegalHelloWorld.getClassName()));
@@ -65,7 +64,7 @@ class JavacTest {
     void compile_hello_world() {
         Compilation compilation = Javac.init()
                 .with(helloWorld, foo)
-                .options(BUILD_DIRECTORY, tempDir.getAbsolutePath())
+                .options(OptionListBuilder.builder().buildDir(tempDir.getAbsolutePath()))
                 .compile();
 
         assertTrue(compilation.hasClass(helloWorld.getClassName()));
